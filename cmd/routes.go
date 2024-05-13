@@ -6,7 +6,7 @@ import (
 )
 
 func setupRoutes(r *gin.Engine) {
-	r.GET("/", handlers.ListUsers)
+	r.GET("/getUsers", handlers.ListUsers)
 
 	r.POST("/addUser", handlers.CreateUser)
 

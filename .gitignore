@@ -3,3 +3,4 @@ post_cmd.txt
 pre_cmd.txt
 tmp/
 frontend/node_modules
+.idea/

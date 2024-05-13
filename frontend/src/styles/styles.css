@@ -1,0 +1,17 @@
+div {
+    font: 16px "Ubuntu Sans", sans-serif;
+}
+
+body {
+    background-color: chocolate;
+}
+
+.inputClass {
+    height: 10px;
+    color : #7B3F00;
+}
+.container {
+    color: black;
+    background-color: chocolate;
+    text-align: center;
+}
