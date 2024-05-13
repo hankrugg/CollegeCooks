@@ -6,8 +6,8 @@ import (
 )
 
 func setupRoutes(r *gin.Engine) {
-	r.GET("/", handlers.ListFacts)
+	r.GET("/", handlers.ListUsers)
 
-	r.POST("/fact", handlers.CreateFact)
+	r.POST("/addUser", handlers.CreateUser)
 
 }
