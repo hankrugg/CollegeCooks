@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/hankrugg/CollegeCooks/database"
@@ -14,6 +15,8 @@ import (
 
 func ListUsers(c *gin.Context) {
 
+	Validate(c)
+
 	// Define a slice to hold the retrieved facts
 	var users []models.User
 
@@ -25,7 +28,12 @@ func ListUsers(c *gin.Context) {
 	}
 
 	// Return the retrieved facts as a response
-	c.JSON(http.StatusOK, users)
+	user, _ := c.Get("user")
+
+	c.JSON(http.StatusOK, gin.H{
+		"user":  user,
+		"users": users,
+	})
 }
 
 func Register(c *gin.Context) {
@@ -116,6 +124,7 @@ func Login(c *gin.Context) {
 
 	// create jwt
 	expiration := time.Now().Add(time.Hour)
+
 	// Create the Claims
 	claims := &jwt.RegisteredClaims{
 		ExpiresAt: jwt.NewNumericDate(expiration),
@@ -136,9 +145,9 @@ func Login(c *gin.Context) {
 
 	// create cookie
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("Authorization", ss, expiration.Minute(), "", "", false, true)
-	// respond
+	c.SetCookie("Authorization", ss, 3600, "", "", false, true)
 
+	// respond
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Successfully logged in",
 	})
@@ -146,9 +155,8 @@ func Login(c *gin.Context) {
 }
 
 func Validate(c *gin.Context) {
-	
+
 	user, _ := c.Get("user")
-	c.JSON(http.StatusOK, gin.H{
-		"message": user,
-	})
+
+	fmt.Println(user)
 }

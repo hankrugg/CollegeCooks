@@ -16,7 +16,7 @@ export default function LoginPage() {
         const email = formData.get('email')
         const password = formData.get('password')
 
-        axios.post("http://localhost:3000/login", { email: email, password: password })
+        axios.post("http://localhost:3000/login", { email: email, password: password }, { withCredentials: true })
             .then(response => {
                 // Handle successful response
                 console.log("Response status:", response.status);
@@ -66,6 +66,9 @@ export default function LoginPage() {
                     Login
                 </Button>
             </form>
+            <Button onClick={() => navigate("/register")}>
+                Register
+            </Button>
             <div>
                 {passwordError && <span>{passwordError}</span>}
             </div>
