@@ -12,4 +12,6 @@ func setupRoutes(r *gin.Engine) {
 
 	r.POST("/login", handlers.Login)
 
+	r.GET("/validate", RequireAuth, handlers.Validate)
+
 }

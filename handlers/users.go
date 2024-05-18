@@ -8,6 +8,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -119,6 +120,7 @@ func Login(c *gin.Context) {
 	claims := &jwt.RegisteredClaims{
 		ExpiresAt: jwt.NewNumericDate(expiration),
 		Issuer:    "test",
+		Subject:   strconv.Itoa(int(user.ID)),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -141,4 +143,12 @@ func Login(c *gin.Context) {
 		"message": "Successfully logged in",
 	})
 
+}
+
+func Validate(c *gin.Context) {
+	
+	user, _ := c.Get("user")
+	c.JSON(http.StatusOK, gin.H{
+		"message": user,
+	})
 }
