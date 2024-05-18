@@ -15,3 +15,17 @@ body {
     background-color: chocolate;
     text-align: center;
 }
+
+.container-fluid {
+    display: flex;
+    justify-content: center; /* Center the content horizontally */
+}
+
+.wrapper {
+    flex: 0 0 auto; /* Do not grow, do not shrink, fixed width */
+}
+
+.centered-content {
+    flex: 1; /* Grow to fill available space */
+    text-align: center; /* Center the content horizontally */
+}

@@ -39,6 +39,7 @@
   "devDependencies": {
     "axios": "^1.6.8",
     "cors": "^2.8.5",
+    "react-pro-sidebar": "^1.1.0",
     "react-router-dom": "^6.23.1",
     "reactstrap": "^9.2.2"
   }

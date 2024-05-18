@@ -7,6 +7,7 @@ export default function App() {
   return (
       <BrowserRouter>
         <Routes>
+            <Route path={"/"} element={<LoginPage/>}></Route>
             <Route path={"/login"} element={<LoginPage/>}></Route>
             <Route path={"/dashboard"} element={<Dashboard/>}></Route>
         </Routes>

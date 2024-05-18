@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import {Button, Input} from "reactstrap";
 import { useNavigate } from 'react-router-dom'
 import "../styles/styles.css"
+import axios from "axios";
 
 export default function LoginPage() {
     const [emailError, setEmailError] = useState('')
@@ -14,6 +15,11 @@ export default function LoginPage() {
         const formData = new FormData(e.currentTarget)
         const email = formData.get('email')
         const password = formData.get('password')
+
+        console.log(email, password)
+        const response = await axios.post("http://localhost:3000/login", {email: email, password: password})
+
+        console.log(response)
         navigate("/dashboard")
     }
 

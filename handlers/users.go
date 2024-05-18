@@ -1,16 +1,19 @@
 package handlers
 
 import (
-	"encoding/base64"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/hankrugg/CollegeCooks/database"
 	"github.com/hankrugg/CollegeCooks/models"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
+	"os"
+	"time"
 )
 
 func ListUsers(c *gin.Context) {
+
 	// Define a slice to hold the retrieved facts
 	var users []models.User
 
@@ -25,13 +28,12 @@ func ListUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, users)
 }
 
-func CreateUser(c *gin.Context) {
+func Register(c *gin.Context) {
 	// Define a struct to represent the JSON body
 	var requestBody struct {
 		Email     string `json:"email"`
 		FirstName string `json:"first"`
 		LastName  string `json:"last"`
-		Username  string `json:"username"`
 		Password  string `json:"password"`
 	}
 
@@ -45,33 +47,103 @@ func CreateUser(c *gin.Context) {
 	Email := requestBody.Email
 	FirstName := requestBody.FirstName
 	LastName := requestBody.LastName
-	Username := requestBody.Username
 	Password, _ := hashPassword(requestBody.Password)
 
-	// Use the values as needed
+	user := models.User{Email: Email, FirstName: FirstName, LastName: LastName, Password: string(Password)}
+	err := database.DB.Db.Create(&user).Error
 
-	// For example, you might create a new Fact with these values:
-	user := models.User{Email: Email, FirstName: FirstName, LastName: LastName, Username: Username, Password: Password}
-	tx := database.DB.Db.Create(&user)
-
-	fmt.Println(tx)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Error creating user",
+			"email":   Email,
+		})
+		return
+	}
 
 	// Return a response
 	c.JSON(http.StatusOK, gin.H{
-		"message":  "User created successfully",
-		"email":    Email,
-		"username": Username,
-		"password": Password,
+		"message": "User created successfully",
+		"email":   Email,
 	})
+	return
 }
 
-func hashPassword(rawPassword string) (string, error) {
+func hashPassword(rawPassword string) ([]byte, error) {
 	// Hash the password using bcrypt
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(rawPassword), bcrypt.DefaultCost)
 	if err != nil {
-		return "", err
+		return []byte(""), err
 	}
 	// Encode the hashed password bytes using base64
-	encodedHash := base64.StdEncoding.EncodeToString(hashedPassword)
-	return encodedHash, nil
+	return hashedPassword, nil
+}
+
+func Login(c *gin.Context) {
+	fmt.Println(c.Request.Body)
+
+	// find user
+	var requestBody struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	if err := c.BindJSON(&requestBody); err != nil {
+		// Handle error
+		fmt.Println(err)
+		return
+	}
+
+	var user models.User
+
+	database.DB.Db.First(&user, "email = ?", requestBody.Email)
+	if user.ID == 0 {
+		// If an error occurs, return an internal server error response
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "User and password combination not found",
+		})
+		return
+	}
+
+	//validate user
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(requestBody.Password))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "User and password combination not found",
+		})
+		return
+	}
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "User and password combination not found",
+		})
+		return
+	}
+
+	// create jwt
+	expiration := time.Now().Add(time.Hour)
+	// Create the Claims
+	claims := &jwt.RegisteredClaims{
+		ExpiresAt: jwt.NewNumericDate(expiration),
+		Issuer:    "test",
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	ss, err := token.SignedString([]byte(os.Getenv("SIGNING_KEY")))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed to grant token",
+		})
+		return
+	}
+
+	// create cookie
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("Authorization", ss, expiration.Minute(), "", "", false, true)
+	// respond
+
+	c.JSON(http.StatusOK, gin.H{})
+
 }

@@ -8,6 +8,8 @@ import (
 func setupRoutes(r *gin.Engine) {
 	r.GET("/getUsers", handlers.ListUsers)
 
-	r.POST("/addUser", handlers.CreateUser)
+	r.POST("/register", handlers.Register)
+
+	r.POST("/login", handlers.Login)
 
 }

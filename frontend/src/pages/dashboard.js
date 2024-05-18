@@ -1,38 +1,36 @@
 import React, {useState} from 'react';
 import axios from "axios";
 import {Button} from "reactstrap";
+import Sidebar from "../components/navbar";
+import NavBar from "../components/navbar";
 
 
 export default function Dashboard() {
-    const [users, setUsers] = useState('')
-    const config = {
-        headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS"
-        }
-    };
+    const [users, setUsers] = useState([])
 
     const getUsers = async function () {
         const response = await axios.get("http://localhost:3000/getUsers")
-        console.log(response)
+        setUsers(response.data)
+        console.log(response.data)
     }
 
     return (
         <div className="container-fluid">
-            <nav className="navbar navbar-expand-lg navbar-light bg-light">
-                <div className="container-fluid">
-                </div>
-            </nav>
-            <div className="container mt-5">
-                <div className="row">
-                    <div className="col">
-                        <h2>Dashboard</h2>
-                        <p>This is your dashboard. You can add your content here.</p>
-                        <Button label="getUsers" onClick={ getUsers }>
-                            GetUsers
-                        </Button>
-
-                    </div>
+            <div className="wrapper">
+                <NavBar/>
+            </div>
+            <div className="centered-content">
+                <h2>Dashboard</h2>
+                <p>This is your dashboard. You can add your content here.</p>
+                <Button label="getUsers" onClick={getUsers}>
+                    GetUsers
+                </Button>
+                <div>
+                    <ul>
+                        {users.map(user => (
+                            <li key={user.ID}>{user.email}</li>
+                        ))}
+                    </ul>
                 </div>
             </div>
         </div>
