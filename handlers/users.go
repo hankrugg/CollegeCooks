@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/hankrugg/CollegeCooks/database"
@@ -79,17 +78,18 @@ func hashPassword(rawPassword string) ([]byte, error) {
 }
 
 func Login(c *gin.Context) {
-	fmt.Println(c.Request.Body)
-
 	// find user
 	var requestBody struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
 
-	if err := c.BindJSON(&requestBody); err != nil {
+	err := c.BindJSON(&requestBody)
+	if err != nil {
 		// Handle error
-		fmt.Println(err)
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Failed to read request data",
+		})
 		return
 	}
 
@@ -98,24 +98,16 @@ func Login(c *gin.Context) {
 	database.DB.Db.First(&user, "email = ?", requestBody.Email)
 	if user.ID == 0 {
 		// If an error occurs, return an internal server error response
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "User and password combination not found",
 		})
 		return
 	}
 
 	//validate user
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(requestBody.Password))
-
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(requestBody.Password))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "User and password combination not found",
-		})
-		return
-	}
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "User and password combination not found",
 		})
 		return
@@ -130,10 +122,11 @@ func Login(c *gin.Context) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	ss, err := token.SignedString([]byte(os.Getenv("SIGNING_KEY")))
+	signingKey := []byte(os.Getenv("SIGNING_KEY")) // Load the signing key from environment variable
+	ss, err := token.SignedString(signingKey)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "Failed to grant token",
 		})
 		return
@@ -144,6 +137,8 @@ func Login(c *gin.Context) {
 	c.SetCookie("Authorization", ss, expiration.Minute(), "", "", false, true)
 	// respond
 
-	c.JSON(http.StatusOK, gin.H{})
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Successfully logged in",
+	})
 
 }
