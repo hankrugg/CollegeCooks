@@ -1,8 +1,16 @@
 import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar';
-import { Link } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
+import axios from "axios";
+
 
 
 export default function NavBar() {
+    const navigate = useNavigate()
+
+
+    const logout = async function () {
+        const response = await axios.get("http://192.168.0.98:3000/logout" , { withCredentials: true })
+    }
 
     return(
         <div>
@@ -11,7 +19,6 @@ export default function NavBar() {
                     menuItemStyles={{
                         button: {
                             // the active class will be added automatically by react router
-                            // so we can use it to style the active menu item
                             [`&.active`]: {
                                 backgroundColor: '#13395e',
                                 color: '#b6c8d9',
@@ -20,8 +27,8 @@ export default function NavBar() {
                     }}
                 >
                     <MenuItem component={<Link to="/pantry"/>}> Pantry</MenuItem>
-                    <MenuItem component={<Link to="/calendar"/>}> Calendar</MenuItem>
-                    <MenuItem component={<Link to="/e-commerce"/>}> E-commerce</MenuItem>
+                    <MenuItem component={<Link to="/dashboard"/>}> Dashboard</MenuItem>
+                    <MenuItem component={<Link to="/login"/>}>Logout</MenuItem>
                 </Menu>
             </Sidebar>
         </div>

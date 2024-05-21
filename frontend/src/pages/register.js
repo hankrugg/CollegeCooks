@@ -18,7 +18,7 @@ export default function RegisterPage() {
         const last = formData.get('last')
         const password = formData.get('password')
 
-        axios.post("http://localhost:3000/register", { email: email, first: first, last: last, password: password })
+        axios.post("http://192.168.0.98:3000/register", { email: email, first: first, last: last, password: password })
             .then(response => {
                 // Handle successful response
                 console.log("Response status:", response.status);

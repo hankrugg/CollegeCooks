@@ -16,7 +16,7 @@ export default function LoginPage() {
         const email = formData.get('email')
         const password = formData.get('password')
 
-        axios.post("http://localhost:3000/login", { email: email, password: password }, { withCredentials: true })
+        axios.post("http://192.168.0.98:3000/login", { email: email, password: password }, { withCredentials: true })
             .then(response => {
                 // Handle successful response
                 console.log("Response status:", response.status);
@@ -31,6 +31,7 @@ export default function LoginPage() {
             .catch(error => {
                 // Handle error
                 console.error("Error:", error);
+                console.log(error.response.status)
                 if (error.response.status === 401) {
                     // Authentication failed, display error message to the user
                     setPasswordError('Username and password combination not found');
@@ -49,22 +50,14 @@ export default function LoginPage() {
             <br/>
             <form onSubmit={Submit}>
                 <div className="input-group-lg">
-                    <Input
-                        type="text" id="email" name="email" label="Email" placeholder="Email"
-                    />
+                    <Input type="text" id="email" name="email" label="Email" placeholder="Email"/>
                 </div>
                 <br/>
                 <div className="input-group-lg">
-                    <Input
-                        type="password" id="password" name="password" label="Password" placeholder="Password"
-                    />
+                    <Input type="password" id="password" name="password" label="Password" placeholder="Password"/>
                 </div>
                 <br/>
-                <Button
-                    value="Submit" label="Login"
-                >
-                    Login
-                </Button>
+                <Button value="Submit" label="Login">Login</Button>
             </form>
             <Button onClick={() => navigate("/register")}>
                 Register

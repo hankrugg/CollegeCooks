@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/hankrugg/CollegeCooks/database"
@@ -13,26 +12,23 @@ import (
 	"time"
 )
 
-func ListUsers(c *gin.Context) {
-
-	Validate(c)
+func GetUser(c *gin.Context) {
 
 	// Define a slice to hold the retrieved facts
-	var users []models.User
+	userObj, _ := c.Get("user")
+	userID := userObj.(models.User).ID
 
 	// Retrieve all facts from the database
-	if err := database.DB.Db.Find(&users).Error; err != nil {
-		// If an error occurs, return an internal server error response
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+	var user models.User
+	err := database.DB.Db.Where("id = ?", userID).Find(&user).Error
+	if err != nil {
+		// Handle the error, such as returning a suitable response
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to find ingredients"})
 		return
 	}
 
-	// Return the retrieved facts as a response
-	user, _ := c.Get("user")
-
 	c.JSON(http.StatusOK, gin.H{
-		"user":  user,
-		"users": users,
+		"user": user,
 	})
 }
 
@@ -151,12 +147,4 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Successfully logged in",
 	})
-
-}
-
-func Validate(c *gin.Context) {
-
-	user, _ := c.Get("user")
-
-	fmt.Println(user)
 }

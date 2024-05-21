@@ -14,16 +14,21 @@ type User struct {
 
 type Recipe struct {
 	gorm.Model
-	Ingredients []Ingredient `json:"Ingredients"`
-	Directions  string       `json:"Directions"`
-	PrepTime    int          `json:"PrepTime"`
-	CookTime    int          `json:"CookTime"`
+	Title       string `json:"title" gorm:"text;not null;default:null;unique"`
+	Directions  string `json:"directions"`
+	Time        string `json:"time"`
+	Ingredients string `json:"ingredients"`
+	Source      string `json:"source"`
 }
 
 type Ingredient struct {
 	gorm.Model
-	Name     string `json:"Name" gorm:"text;not null;default:null`
-	Fruit    bool   `json:"fruit" gorm:"bool; not null;default:null`
-	LastName string `json:"last" gorm:"text; not null;default:null`
-	Username string `json:"username" gorm:"text;not null;default:null`
+	Name      string `json:"Name" gorm:"text;not null;default:null"`
+	Quantity  int    `json:"Quantity" gorm:"int;not null;default:1"`
+	Fruit     bool   `json:"fruit" gorm:"bool; not null;default:false"`
+	Vegetable bool   `json:"vegetable" gorm:"bool; not null;default:false"`
+	Meat      bool   `json:"meat" gorm:"bool; not null;default:false"`
+	Grain     bool   `json:"grain" gorm:"bool; not null;default:false"`
+	UserID    uint   `json:"UserID" gorm:"not null"` // Foreign key
+	User      User   `json:"user"`                   // Associated user
 }
